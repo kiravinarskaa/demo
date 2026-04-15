@@ -92,13 +92,13 @@ function nextQuestion() {
 
 /* Show final screen after training is completed */
 function showFinalResult() {
-    /* Hide the answer buttons section completely */
-    const actionSection = document.querySelector(".button-group");
-    if (actionSection) {
-        actionSection.parentElement.style.display = "none";
+    /* Hide the whole actions section */
+    const actionsSection = document.getElementById("actions-section");
+    if (actionsSection) {
+        actionsSection.style.display = "none";
     }
 
-    /* Hide the scenario progress box if you want cleaner finish */
+    /* Update score section */
     const scoreSection = document.querySelector(".score-box");
     if (scoreSection) {
         scoreSection.innerHTML = `
@@ -107,26 +107,25 @@ function showFinalResult() {
         `;
     }
 
-    /* Replace email scenario with final result */
+    /* Replace scenario area with final result */
     document.querySelector(".email-box").innerHTML = `
         <div class="result-box">
             <h2>Training Complete</h2>
             <p>Your final score is <strong>${score}</strong> out of <strong>${questions.length}</strong>.</p>
             <p>
-                Great job practicing phishing awareness. The goal of this demo
-                is to help users identify suspicious emails and make safer decisions online.
+                Great job practicing phishing awareness. This demo helps users
+                recognize suspicious emails and make safer decisions online.
             </p>
             <button class="btn" onclick="restartQuiz()">Restart Demo</button>
         </div>
     `;
 
-    /* Replace feedback area with final feedback only */
+    /* Replace feedback box with final feedback */
     document.querySelector(".feedback-box").innerHTML = `
         <h2>Final Feedback</h2>
         <p>
-            You completed the training successfully. This prototype demonstrates how
-            interactive awareness exercises can help users recognize phishing attacks
-            before they cause harm.
+            You completed the training successfully. Interactive awareness exercises
+            like this can help users detect phishing before it causes harm.
         </p>
     `;
 }
@@ -136,6 +135,12 @@ function restartQuiz() {
     currentQuestion = 0;
     score = 0;
     answered = false;
+
+    /* Show actions section again */
+    const actionsSection = document.getElementById("actions-section");
+    if (actionsSection) {
+        actionsSection.style.display = "block";
+    }
 
     /* Restore score box */
     const scoreSection = document.querySelector(".score-box");
@@ -162,24 +167,6 @@ function restartQuiz() {
         </div>
     `;
 
-    /* Restore action buttons section */
-    const actionSection = document.querySelector(".section .button-group");
-    if (actionSection) {
-        actionSection.parentElement.style.display = "block";
-    } else {
-        const sections = document.querySelectorAll(".section");
-        if (sections[2]) {
-            sections[2].innerHTML = `
-                <h2>What would you do?</h2>
-                <div class="button-group">
-                    <button class="btn red-btn" onclick="checkAnswer('click')">Click the Link</button>
-                    <button class="btn green-btn" onclick="checkAnswer('report')">Report Phishing</button>
-                    <button class="btn gray-btn" onclick="checkAnswer('ignore')">Ignore Message</button>
-                </div>
-            `;
-        }
-    }
-
     /* Restore feedback box */
     document.querySelector(".feedback-box").innerHTML = `
         <h2>Feedback</h2>
@@ -191,6 +178,5 @@ function restartQuiz() {
 
     loadQuestion();
 }
-
 /* Load first question when page opens */
 loadQuestion();
