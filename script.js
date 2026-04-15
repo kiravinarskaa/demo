@@ -1,16 +1,8 @@
 /* 
    This file controls the quiz logic
-  */
-
-/* Array of training scenarios
-   Each scenario contains:
-   - sender: who sent the message
-   - subject: email subject
-   - message: email content
-   - link: shown link
-   - correct: correct answer
-   - feedback: explanation
 */
+
+/* Array of training scenarios */
 const questions = [
     {
         sender: "support@universty-check.com",
@@ -47,48 +39,35 @@ let score = 0;
 /* Prevent answering same question many times */
 let answered = false;
 
-/* This function loads current question into the page */
+/* Load current question into page */
 function loadQuestion() {
-    // Get current question object
     const q = questions[currentQuestion];
 
-    // Put data into HTML elements
     document.getElementById("sender").textContent = q.sender;
     document.getElementById("subject").textContent = q.subject;
     document.getElementById("message").textContent = q.message;
     document.getElementById("link-text").textContent = q.link;
 
-    // Update progress information
     document.getElementById("question-number").textContent = currentQuestion + 1;
     document.getElementById("total-questions").textContent = questions.length;
 
-    // Reset feedback text
     document.getElementById("feedback-text").textContent = "Choose an answer to see feedback.";
-
-    // Hide next button until user answers
     document.getElementById("next-btn").style.display = "none";
 
-    // Allow answering current question
     answered = false;
 }
 
-/* This function checks the user's answer */
+/* Check user answer */
 function checkAnswer(userChoice) {
-    // If question already answered, stop
     if (answered) {
         return;
     }
 
-    // Mark as answered
     answered = true;
 
-    // Get current question
     const q = questions[currentQuestion];
-
-    // Feedback element
     const feedbackText = document.getElementById("feedback-text");
 
-    // Check answer
     if (userChoice === q.correct) {
         score++;
         document.getElementById("score").textContent = score;
@@ -97,15 +76,13 @@ function checkAnswer(userChoice) {
         feedbackText.textContent = "❌ Incorrect. " + q.feedback;
     }
 
-    // Show next button
     document.getElementById("next-btn").style.display = "inline-block";
 }
 
-/* This function goes to next scenario */
+/* Go to next question */
 function nextQuestion() {
     currentQuestion++;
 
-    // If questions remain, load next one
     if (currentQuestion < questions.length) {
         loadQuestion();
     } else {
@@ -113,37 +90,64 @@ function nextQuestion() {
     }
 }
 
-/* This function shows final result after last question */
+/* Show final screen after training is completed */
 function showFinalResult() {
-    // Replace scenario box with result box
+    /* Hide the answer buttons section completely */
+    const actionSection = document.querySelector(".button-group");
+    if (actionSection) {
+        actionSection.parentElement.style.display = "none";
+    }
+
+    /* Hide the scenario progress box if you want cleaner finish */
+    const scoreSection = document.querySelector(".score-box");
+    if (scoreSection) {
+        scoreSection.innerHTML = `
+            <h2>Training Completed</h2>
+            <p>You have finished all phishing scenarios.</p>
+        `;
+    }
+
+    /* Replace email scenario with final result */
     document.querySelector(".email-box").innerHTML = `
         <div class="result-box">
             <h2>Training Complete</h2>
             <p>Your final score is <strong>${score}</strong> out of <strong>${questions.length}</strong>.</p>
             <p>
-                This demo helps users practice identifying suspicious emails
-                and choosing safer actions.
+                Great job practicing phishing awareness. The goal of this demo
+                is to help users identify suspicious emails and make safer decisions online.
             </p>
             <button class="btn" onclick="restartQuiz()">Restart Demo</button>
         </div>
     `;
 
-    // Update feedback message
-    document.getElementById("feedback-text").textContent =
-        "You finished the training. Review the scenarios and keep practicing.";
-
-    // Hide next button
-    document.getElementById("next-btn").style.display = "none";
+    /* Replace feedback area with final feedback only */
+    document.querySelector(".feedback-box").innerHTML = `
+        <h2>Final Feedback</h2>
+        <p>
+            You completed the training successfully. This prototype demonstrates how
+            interactive awareness exercises can help users recognize phishing attacks
+            before they cause harm.
+        </p>
+    `;
 }
 
-/* This function restarts the quiz */
+/* Restart quiz */
 function restartQuiz() {
-    // Reset variables
     currentQuestion = 0;
     score = 0;
     answered = false;
 
-    // Restore the scenario box HTML
+    /* Restore score box */
+    const scoreSection = document.querySelector(".score-box");
+    scoreSection.innerHTML = `
+        <h2>Your Score: <span id="score">0</span></h2>
+        <p>
+            Scenario <span id="question-number">1</span> of
+            <span id="total-questions">3</span>
+        </p>
+    `;
+
+    /* Restore email box */
     document.querySelector(".email-box").innerHTML = `
         <div class="email-header">
             <p><strong>From:</strong> <span id="sender"></span></p>
@@ -158,10 +162,33 @@ function restartQuiz() {
         </div>
     `;
 
-    // Reset score display
-    document.getElementById("score").textContent = score;
+    /* Restore action buttons section */
+    const actionSection = document.querySelector(".section .button-group");
+    if (actionSection) {
+        actionSection.parentElement.style.display = "block";
+    } else {
+        const sections = document.querySelectorAll(".section");
+        if (sections[2]) {
+            sections[2].innerHTML = `
+                <h2>What would you do?</h2>
+                <div class="button-group">
+                    <button class="btn red-btn" onclick="checkAnswer('click')">Click the Link</button>
+                    <button class="btn green-btn" onclick="checkAnswer('report')">Report Phishing</button>
+                    <button class="btn gray-btn" onclick="checkAnswer('ignore')">Ignore Message</button>
+                </div>
+            `;
+        }
+    }
 
-    // Load first question again
+    /* Restore feedback box */
+    document.querySelector(".feedback-box").innerHTML = `
+        <h2>Feedback</h2>
+        <p id="feedback-text">Choose an answer to see feedback.</p>
+        <button class="btn" id="next-btn" onclick="nextQuestion()" style="display: none;">
+            Next Scenario
+        </button>
+    `;
+
     loadQuestion();
 }
 
